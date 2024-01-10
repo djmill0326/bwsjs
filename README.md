@@ -1,2 +1,1 @@
-# bwsjs
-basic web server v0.1a
+# bw-server v1

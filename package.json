@@ -1,20 +1,18 @@
 {
-  "name": "d-streamer",
-  "version": "1.0.0",
-  "description": "stream directly to http",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "bun-bwsjs",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
   },
-  "keywords": [
-    "stream"
-  ],
-  "author": "dyl",
-  "license": "ISC",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
   "dependencies": {
-    "cors": "^2.8.5",
     "express": "^4.18.2",
+    "express-cors": "^0.0.3",
     "node-fetch": "^3.3.2",
-    "socket.io": "^4.7.2"
+    "side-channel": "^1.0.4",
+    "socket.io": "^4.7.3"
   }
 }
