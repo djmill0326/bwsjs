@@ -1,0 +1,25 @@
+{
+    "controls": [
+        { "form": {
+            "element": "form",
+            "traits": { "id": "rpc-form" },
+            "label": ["Enter linking code", "simple"],
+            "children": [
+                {
+                    "input": {
+                        "element": "input",
+                        "traits": [["id", "rpc-input"], ["type", "password"], ["placeholder", "Enter linking code..."]],
+                        "bind": [["change", "rpc-input", "e.target.value"]]
+                    },
+                    "submit": {
+                        "element": "input",
+                        "traits": [["id", "rpc-input"], ["type", "submit"], ["value", "Link!"]],
+                        "on": {
+                            "submit": "(ev) => ev.preventDefault(); console.log('form submitted')"
+                        }
+                    }
+                }
+            ]
+        }}
+    ]
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Frame (index)</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto; }
+</style>
+<link rel="stylesheet" href="./min.css" />
+<script src="./bootstrap.js" type="module"></script>
+</head>
+<body>
+<h1>Welcome to dyl's page.</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+<script src="../haptloader/v1/hapt_rt.js" type="module"></script>
+<script type="module">
+    wasm_init().then(wasm => {
+        wasm.set(0x0000, 0x01);
+        wasm.set(0xFFFF, wasm.get(0x0000));
+        const vector = wasm.get(0xFFFF);
+        wasm.init();
+        window.Wasm = wasm;
+        console.warn("bootloader version: 0.1." + vector + "a")
+        alert("This site uses haptloader (1.0." + vector + ")");
+        console.warn("hapt-wasm", wasm);
+        function args(x) {
+            const send = (x=(x="stripped")=>`${x} (touched)`) => {
+                console.warn("[[core-hook]]", x); x
+            };
+            send(`[core-hook/${wasm.get(0xFFFF)}] ${x}`);
+        };
+        window.args = args;
+    });
+    window.hapt = Object.create(null);
+    window.hapt.reset = function reset() { return window.Wasm.init(); }
+    window.hapt.get = function get(x) { return window.Wasm.get(x); }
+    window.hapt.set = function set(x, y) { return window.Wasm.set(x, y); }
+</script>
+<iframe src="./index.htm" width="484" height="323"></iframe>
+</body>
+</html>

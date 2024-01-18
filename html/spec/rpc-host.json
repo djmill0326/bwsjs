@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "src": "http://localhost/rpc/host.js",
+  "requires": ["socket.io"]
+}

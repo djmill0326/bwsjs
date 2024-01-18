@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "src": "http://localhost/ecs/ecs.js",
+  "requires": ["ecs.ctx"]
+}

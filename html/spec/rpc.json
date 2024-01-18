@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "src": "http://localhost/rpc/min.js",
+  "requires": ["socket.io"],
+  "ui": true
+}
