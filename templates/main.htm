@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>%{title}% (caramelldansen)</title>
+<style>
+html { color-scheme: dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Verdana, Arial, sans-serif; }
+</style>
+<style>
+    #main {
+        padding-bottom: 0.5em;
+        border-bottom: 1px solid #ccc;
+    }
+    #portal {
+        display: flex;
+        flex-direction: column;
+    }
+    #portal iframe {
+        height: 300px;
+        border: none;
+    }
+    #porthole {
+        margin-top: 1em;
+        width: 100%;
+        align-self: center;
+    }
+    #music {
+        margin-top: 1em;
+    }
+
+    label[for="0"] {
+        margin-right: 0.5em;
+        text-decoration: underline;
+        text-transform: uppercase;
+        font-size: 0.8em;
+        color: #ccc;
+    }
+    #term {
+        border: 2px solid grey;
+        background: none;
+        border-radius: 0.25em;
+        outline: none;
+    }
+    #btn {
+        text-transform: uppercase;
+        font-size: 0.8em;
+    }
+</style>
+<script src="http://ehpt.org/bwsjs/js/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="placeholder">%{placeholder}%</div>
+    <div id="content">%{content}%</div>
+    <pre style="position:fixed;bottom:1em;right:1em;font-size:0.8em;color:gainsboro;">%{tag}%</pre>
+</body>
+</html>
