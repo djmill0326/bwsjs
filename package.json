@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "express": "^4.19.2",
+    "mime-types": "^2.1.35"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "socket.io": "^4.7.5"
+  }
+}
