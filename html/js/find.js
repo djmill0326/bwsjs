@@ -39,7 +39,7 @@ const pull_next_anchor = (a, looping=true) => {
         if (looping && initial) next = initial;
         else return;
     } else next = ne.children[0];
-    if (music_browser) console.log("[hapt-player/info]", `next in playlist: ${describe_file(next.href)}`);
+    if (music_browser.update) console.log("[hapt-player/info]", `next in playlist: ${describe_file(next.href)}`);
     return queued = next;
 };
 
@@ -54,8 +54,11 @@ form.onsubmit = (e) => {
     e.preventDefault();
     const term = form.children['term'].value;
     query = (term[0] === "/" ? "" : "/") + term + (term.length ? "/" : "");
-    if (!query.startsWith("music/")) music_browser.remove && music_browser.remove();
-    fetch_query(query, frame);
+    if (!query.startsWith("music/") && music_browser.remove) music_browser.remove();
+    fetch_query(query, frame, () => {
+        const reset = pull_first_anchor();
+        if (reset) queued = reset;
+    });
     console.debug("form submission");
 }
 const update_link = (link) => {
@@ -68,9 +71,7 @@ const update_link = (link) => {
         const song_descriptor = describe_file(link)
         console.log("[hapt-player/info]", `now playing: ${song_descriptor}`);
         update_music_browser(song_descriptor);
-    } else if (!document.getElementById("porthole"))
-        // music element sticks around forever, why not.
-        audio_element.insertAdjacentElement("beforebegin", portal);
+    }
 };
 
 frame.onclick = (e) => {
@@ -125,6 +126,9 @@ const music_browser_init = (song) => {
         remove: () => {
             player.remove();
             music_browser = {};
+            portal.src = "filter.html";
+            audio_element.insertAdjacentElement("beforebegin", portal);
+            audio_element.remove();
         }
     };
 }

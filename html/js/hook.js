@@ -2,10 +2,11 @@ import { stripped } from './stripped.js';
 stripped();
 console.log(window.Globals);
 
-export async function fetch_query(query, frame) {
+export async function fetch_query(query, frame, cb) {
     const response = await fetch(`http://ehpt.org:666/ls ${query}`);
     const data = await response.text();
     frame.innerHTML = data;
+    if(cb) cb(data);
 }
 
 export const utils = Object.seal({
