@@ -11,12 +11,44 @@ const frame = document.getElementById("frame");
 const portal = document.getElementById("porthole");
 const music = document.getElementById("music");
 let query = "";
+let queued = null;
 let music_browser = {};
 
 const audio_element = document.createElement("audio");
 audio_element.controls = true;
 audio_element.type = "audio/mpeg";
 audio_element.autoplay = true;
+
+const describe_file = (link) => {
+    const split = link.split("/");
+    let list = decodeURI(split[split.length - 1]).split(".");
+    if (list.length > 2) {
+        const ext = list.pop();
+        const name = list.join(".");
+        list = [name, ext];
+    }
+    return `${list[0]} [${list[1] ? list[1] : "unknown extension"}]`;
+};
+
+const pull_first_anchor = () => frame.children[1].children[0].children[0];
+
+const pull_next_anchor = (a, looping=true) => {
+    const ne = a.parentElement.nextElementSibling; let next;
+    if (!ne || !ne.children || ne.children.length === 0 || !ne.children[0].href) {
+        const initial = pull_first_anchor();
+        if (looping && initial) next = initial;
+        else return;
+    } else next = ne.children[0];
+    if (music_browser) console.log("[hapt-player/info]", `next in playlist: ${describe_file(next.href)}`);
+    return queued = next;
+};
+
+audio_element.onended = () => {
+    if (queued) {
+        update_link(queued.href);
+        pull_next_anchor(queued);
+    }
+};
 
 form.onsubmit = (e) => {
     e.preventDefault();
@@ -33,24 +65,19 @@ const update_link = (link) => {
         portal.insertAdjacentElement("afterend", audio_element);
         portal.remove();
         audio_element.src = link;
-        const list = link.split("/");
-        let song = decodeURI(list[list.length - 1]).split(".");
-        if (song.length > 2) {
-            const ext = song.pop();
-            const name = song.join(".");
-            song = [name, ext];
-        }
-        const song_descriptor = `${song[0]} [${song[1] ? song[1] : "unknown extension"}]`;
+        const song_descriptor = describe_file(link)
         console.log("[hapt-player/info]", `now playing: ${song_descriptor}`);
         update_music_browser(song_descriptor);
-    } else if (!document.getElementById("porthole")) audio_element.insertAdjacentElement("beforebegin", portal);
-    // music element sticks around forever, why not.
+    } else if (!document.getElementById("porthole"))
+        // music element sticks around forever, why not.
+        audio_element.insertAdjacentElement("beforebegin", portal);
 };
 
 frame.onclick = (e) => {
     if (e.target.href) {
         e.preventDefault();
-        update_link(e.target.href)
+        update_link(e.target.href);
+        pull_next_anchor(e.target);
     }
 }
 
