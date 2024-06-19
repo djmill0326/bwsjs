@@ -6,9 +6,6 @@ import { stat } from "fs/promises"
 const PORT = 80
 const STATIC_ROOT = "./html"
 
-const CACHE_AGE = Math.ceil(-1 + (2 / 3) * 1000)
-const CACHE_HEADER = `public, max-age=${CACHE_AGE}`
-
 // i hate this dumbass system
 // import { lookup } from "mime-types"
 
@@ -18,9 +15,9 @@ const map = {
     js: "text/javascript",
     json: "application/json",
     wasm: "application/wasm",
-    mp3: "audio/mp3",
-    wav: "audio/mp3",
-    flac: "audio/mp3",
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    flac: "audio/flac",
     png: "image/png",
     gif: "image/gif",
     jpg: "image/jpeg",
@@ -47,27 +44,17 @@ const err = (url, res) => {
     res.end()
 }
 
-const check_cache = (url, stats, req, res) => {
-    if (new Date(req.headers["If-Modified-Since"]) >= stats.mtime) {
-        console.log(`request for ${url} (cached)`)
-        res.writeHead(304, "your cache is good, champ.")
-        res.end()
-        return true
-    }
-}
-
 const server = createServer(async (req, res) => {
     const url = transform(req.url);
     try {
         const stats = await stat(url);
         if (stats.isFile()) {
-            res.setHeader("Content-Encoding", "gzip")
-            res.setHeader("Cache-Control", CACHE_HEADER)
-            res.setHeader("Last-Modified", stats.mtime.toUTCString())
-            if (check_cache(url, stats, req, res)) return
+            res.setHeader("Content-Encoding", "gzip");
+            res.setHeader("Cache-Control", "max-age=604800");
+            res.setHeader("Last-Modified", stats.mtime.toUTCString());
             console.log(`request for ${url}`)
             mime(url, res);
-            createReadStream(url).pipe(createGzip()).pipe(res)
+            createReadStream(url).pipe(createGzip({ level: 1 })).pipe(res);
         } else err(url, res)
     } catch (_) { err(url, res) }
 })

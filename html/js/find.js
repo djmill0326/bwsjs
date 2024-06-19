@@ -13,21 +13,26 @@ const music = document.getElementById("music");
 let query = "";
 let music_browser = {};
 
+const audio_element = document.createElement("audio");
+audio_element.controls = true;
+audio_element.type = "audio/mpeg";
+audio_element.autoplay = true;
+
 form.onsubmit = (e) => {
     e.preventDefault();
     const term = form.children['term'].value;
     query = (term[0] === "/" ? "" : "/") + term + (term.length ? "/" : "");
+    if (!query.startsWith("music/")) music_browser.remove && music_browser.remove();
     fetch_query(query, frame);
     console.debug("form submission");
-
-    if (!query.startsWith("music/")) {
-        music_browser.remove && music_browser.remove();
-    }
 }
-
 const update_link = (link) => {
+    const is_music = link.contains("/music/");
     portal.src = link;
-    if (link.contains("/music/")) {
+    if (is_music) {
+        portal.insertAdjacentElement("afterend", audio_element);
+        portal.remove();
+        audio_element.src = link;
         const list = link.split("/");
         let song = decodeURI(list[list.length - 1]).split(".");
         if (song.length > 2) {
@@ -38,7 +43,8 @@ const update_link = (link) => {
         const song_descriptor = `${song[0]} [${song[1] ? song[1] : "unknown extension"}]`;
         console.log("[hapt-player/info]", `now playing: ${song_descriptor}`);
         update_music_browser(song_descriptor);
-    }
+    } else if (!document.getElementById("porthole")) audio_element.insertAdjacentElement("beforebegin", portal);
+    // music element sticks around forever, why not.
 };
 
 frame.onclick = (e) => {
