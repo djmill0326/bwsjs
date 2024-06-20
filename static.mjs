@@ -6,29 +6,12 @@ import { stat } from "fs/promises"
 const PORT = 80
 const STATIC_ROOT = "./html"
 
-// i hate this dumbass system
-// import { lookup } from "mime-types"
-
-const map = {
-    html: "text/html",
-    css: "text/css",
-    js: "text/javascript",
-    json: "application/json",
-    wasm: "application/wasm",
-    mp3: "audio/mpeg",
-    wav: "audio/wav",
-    flac: "audio/flac",
-    png: "image/png",
-    gif: "image/gif",
-    jpg: "image/jpeg",
-    mp4: "video/mp4"
-}
-
-if (map) globalThis.lookup = x => map[x];
+// adjust mime lookup object as needed
+import mimes from "./mime.mjs";
 
 const mime = (url, res) => {
     const ext = url.substring(url.lastIndexOf(".") + 1, url.length)
-    res.writeHead(200, "epic swag", { 'Content-Type': lookup(ext) })
+    res.writeHead(200, "epic swag", { 'Content-Type': mimes[ext] })
 }
 
 const transform = (url) => {
@@ -44,19 +27,26 @@ const err = (url, res) => {
     res.end()
 }
 
+const pipe = (fromUrl, to, zip=true) => {
+    const input = createReadStream(fromUrl);
+    (zip ? input.pipe(createGzip({ level: 1 })) : input).pipe(to);
+}
+
 const server = createServer(async (req, res) => {
+    const agent = req.headers["user-agent"];
+    const compress = !agent.includes("Chrome");
     const url = transform(req.url);
     try {
         const stats = await stat(url);
         if (stats.isFile()) {
-            res.setHeader("Content-Encoding", "gzip");
+            if (compress) res.setHeader("Content-Encoding", "gzip");
             res.setHeader("Cache-Control", "max-age=604800");
             res.setHeader("Last-Modified", stats.mtime.toUTCString());
             console.log(`request for ${url}`)
             mime(url, res);
-            createReadStream(url).pipe(createGzip({ level: 1 })).pipe(res);
+            pipe(url, res, compress);
         } else err(url, res)
     } catch (_) { err(url, res) }
 })
 
-server.listen(PORT, () => console.log(`server listening on port ${PORT}`))
+server.listen(PORT, () => console.log(`server listening on port ${PORT}`));

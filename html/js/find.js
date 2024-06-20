@@ -54,7 +54,6 @@ form.onsubmit = (e) => {
     e.preventDefault();
     const term = form.children['term'].value;
     query = (term[0] === "/" ? "" : "/") + term + (term.length ? "/" : "");
-    if (!query.startsWith("music/") && music_browser.remove) music_browser.remove();
     fetch_query(query, frame, () => {
         const reset = pull_first_anchor();
         if (reset) queued = reset;
@@ -71,6 +70,10 @@ const update_link = (link) => {
         const song_descriptor = describe_file(link)
         console.log("[hapt-player/info]", `now playing: ${song_descriptor}`);
         update_music_browser(song_descriptor);
+    } else if (music_browser.remove) {
+        audio_element.insertAdjacentElement("beforebegin", portal);
+        audio_element.remove();
+        music_browser.remove();
     }
 };
 
@@ -106,6 +109,7 @@ const music_browser_init = (song) => {
     prev.textContent = "<";
     next.textContent = ">";
     current_song.textContent = song;
+    current_song.onclick = () => audio_element.src = audio_element.src + " ";
 
     player.append(
         //create_label_for(prev_song, "prev"),
@@ -126,9 +130,6 @@ const music_browser_init = (song) => {
         remove: () => {
             player.remove();
             music_browser = {};
-            portal.src = "filter.html";
-            audio_element.insertAdjacentElement("beforebegin", portal);
-            audio_element.remove();
         }
     };
 }

@@ -1,0 +1,15 @@
+export const html = "text/html"
+export const css  = "text/css"
+export const js   = "text/javascript"
+export const json = "application/json"
+export const wasm = "application/wasm"
+export const flac = "audio/flac"
+export const wav  = "audio/wav"
+export const ogg  = "audio/ogg"
+export const mp3  = "audio/mpeg"
+export const mp4  = "video/mp4"
+export const gif  = "image/gif"
+export const jpg  = "image/jpeg"
+export const png  = "image/png"
+export const webp = "image/webp";
+export default { html, css, js, json, wasm, mp3, wav, flac, png, gif, jpg, mp4, ico: png };

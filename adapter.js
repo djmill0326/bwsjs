@@ -94,7 +94,7 @@ const build_url = (dir, filename, use_find = true) => {
 }
 
 const peep = (res, dir, ignore = void 0) => {
-  let output = "<h3>Found (\"" + dir + "\"): </h3><ul>";
+  let output = "<h3>dir <i>" + dir + "</i></h3><ul>";
   let found = false;
 
   readdir("./html" + dir, (files) => {
