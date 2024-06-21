@@ -11,10 +11,10 @@ const $ = globalThis, _ = Object.seal({
   let: () => $._.engine().const,
   get: () => $._.engine("post"),
   post: () => $._.engine("get"),
-  /* space left empty for prayer        */  fDeterminePort: (seed, _=false, $=$=>$) => Math.floor(!_ * $(seed)),
-  /* space left empty for hopes         */  fEvileConstant: (input=!0,should_round) => 
-  /* space left empty for dreams        */  should_round  ? Math.round(input * 2/3 * 1000) 
-  /* space left empty for hope'n'dreams */                :            input * 1000 / 1.5,
+  /* space left empty for spirits (high) */ fDeterminePort: (seed, _=false, $=$=>$) => Math.floor(!_ * $(seed)),
+  /* space left empty for hopes          */ fEvileConstant: (input=!0,should_round) =>
+  /* space left empty for dreams         */ should_round  ? Math.round(input * 2/3 * 1000)
+  /* space left empty for hope'n'dreams  */               : Math.random() - .5 + input * 1000 / 1.5,
   fetch: () => ({
     helper: (dox) => {
       if (filename, dox) {
@@ -24,7 +24,7 @@ const $ = globalThis, _ = Object.seal({
         });
       }
     },
-    helper2: (dox, filename="http://ehpt.org:667") => ({
+    helper2: (dox, filename="http://ehpt.org") => ({
       method: dox ? "POST" : "GET",
       headers: { "Content-Type": "application/json" },
       body: Globals.engine("fetch").helper(filename, dox),
@@ -43,26 +43,23 @@ const GlobalFactory = () => { // makes a global-function prototype
   return bilk_object;
 }; console.info("Global Object (Stripped):", GlobalFactory());
 
-// Import the filesystem module
-const fs = require('fs');
+const fs = require('fs'); // Imports the filesystem module
 
-const readdir = (__dirname, cb) => {
-  // Function to get current filenames in directory (copied from StackOverflow, impossible to figure out)
-  fs.readdir(decodeURIComponent(__dirname), (err, files) => {
-    if (err) {
-      console.log(err);
-      cb([]);
-    } else {
-      console.log("\nCurrent directory filenames:");
-      files.forEach(file => {
-        console.log(file);
-      })
+const cd = '\u001b[3';
+const cl = '\u001b[9';
+const cr = '\u001b[39m';
+
+const readdir = (dir, cb) => {
+  fs.readdir(decodeURIComponent(dir), (err, files) => {
+    if (err) cb([]);
+    else {
+      console.log(`[${cd}3mDirRequest${cr}] uhh here are the files at ${cd}6m${dir}${cr}: ${cl}0m ${files.join("\u001b[39m,\u001b[90m ")}${cr}`);
       cb(files);
     }
   })
 };
 
-// will leave in inefficient form, in hopes compiler recognizes "obvious" optimizations.
+// will leave in inefficient form, in hopes the JIT compiler recognizes obvious optimizations.
 String.prototype.contains = function contains(x) {
   return this.split(x).length > 1;
 };
@@ -197,6 +194,30 @@ route.get('/ls%20:dir([A-Za-z0-9_/-\w%]+)', (req, res) => {
   peep(res, req.params.dir);
 })
 
-server.listen(port, () => console.log("[EvilSocks] socket adapter opened on port", port))
+server.listen(port, () => console.log(`[${cl}0mEvilSocks${cr}] socket adapter opened on port`, port));
+
+const { spawn } = require("child_process");
+const main = spawn("node", ["static.mjs", port]);
+const linesender = (to=process.stdout, prefix=`[${cd}6mServer${cr}]`) => {
+  let sep;
+  let i = -1;
+  return (dat) => {
+    const data = dat.toString();
+    if (!sep && (i = data.indexOf("\n")) !== -1) {
+      if (data.length > i && data[i] === "\r") sep = "\n\r";
+      else sep = "\n";
+    }
+    to.write(data.split(sep).filter(line => line.length).map(line => `${prefix} ${line}`).join("") + sep);
+  };
+};
+const send = linesender();
+main.stdout.on('data', send);
+const senderr = linesender(process.stderr);
+main.stderr.on('data', senderr);
+main.on('close', (code) => {
+  const log = code !== 0 ? console.error : console.warn;
+  log(`server stopped [exit code ${code}]`);
+});
+
 } /* BLOCK ASSUMED TO HAVE BEEN BEGAN. // comment-lexer-token-parser-handle-handler-expr */
 setTimeout(run, 0);

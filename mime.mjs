@@ -11,5 +11,5 @@ export const mp4  = "video/mp4"
 export const gif  = "image/gif"
 export const jpg  = "image/jpeg"
 export const png  = "image/png"
-export const webp = "image/webp";
-export default { html, css, js, json, wasm, mp3, wav, flac, png, gif, jpg, mp4, ico: png };
+export const webp = "image/webp"
+export default { html, css, js, json, wasm, flac, wav, ogg, mp3, mp4, gif, jpg, png, webp, ico: png }

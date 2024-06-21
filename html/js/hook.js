@@ -2,8 +2,30 @@ import { stripped } from './stripped.js';
 stripped();
 console.log(window.Globals);
 
+const loc = document.location.origin + "/50x.html";
+const getheaders = () => new Promise((resolve, reject) => {
+    const req = new XMLHttpRequest();
+    req.onload = () => {
+        const headers = {};
+        req.getAllResponseHeaders().split("\r\n").forEach(x => {
+            const [k, v] = x.split(": ");
+            headers[k] = v;
+        })
+        console.log(headers);
+        resolve(headers);
+    }
+    req.onerror = req.onabort = err => reject(err);
+    req.open('GET', loc, true);
+    req.send(null);
+});
+
+export const getheader = async name => {
+    if (window.headers) return window.headers[name];
+    else return (window.headers = await getheaders())[name];
+}
+
 export async function fetch_query(query, frame, cb) {
-    const response = await fetch(`http://ehpt.org:666/ls ${query}`);
+    const response = await fetch(`http://ehpt.org:${await getheader("adapter-port")}/ls ${query}`);
     const data = await response.text();
     frame.innerHTML = data;
     if(cb) cb(data);

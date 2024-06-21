@@ -1,6 +1,8 @@
-import { dyl, fetch_query } from "./hook.js";
+import { dyl, fetch_query, getheader } from "./hook.js";
 
-console.warn("ok now we ready");
+setInterval(() => window.headers = null, 5000);
+console.warn("detected adapter port:", await getheader("adapter-port"));
+console.info("ok now we ready");
 
 String.prototype.contains = function contains(x) {
     return this.split(x).length > 1;
