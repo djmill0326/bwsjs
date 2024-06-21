@@ -18,7 +18,6 @@ let music_browser = {};
 
 const audio_element = document.createElement("audio");
 audio_element.controls = true;
-audio_element.type = "audio/mpeg";
 audio_element.autoplay = true;
 
 const describe_file = (link) => {

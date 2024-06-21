@@ -11,7 +11,6 @@ const getheaders = () => new Promise((resolve, reject) => {
             const [k, v] = x.split(": ");
             headers[k] = v;
         })
-        console.log(headers);
         resolve(headers);
     }
     req.onerror = req.onabort = err => reject(err);

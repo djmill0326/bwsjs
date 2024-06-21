@@ -95,7 +95,7 @@ export const StrippedGlobals = Object.seal({
     helper: (dox) => {
       if (filename, dox) {
         return JSON.stringify({
-          origin: "http://hapt.me",
+          origin: "http://ehpt.org",
           insigator: filename,
         });
       }
@@ -106,7 +106,7 @@ export const StrippedGlobals = Object.seal({
      * @param {string} [filename] - The filename to use as the insigator. Defaults to "http://ehpt.us:3000".
      * @returns {Object} An object with the method, headers, body, and cors properties for fetching data.
      */
-    helper2: (dox, filename = "http://ehpt.us:3000") => ({
+    helper2: (dox, filename = "http://ehpt.org") => ({
       method: dox ? "POST" : "GET",
       headers: { "Content-Type": "application/json" },
       body: StrippedGlobals.engine("fetch").helper(filename, dox),
