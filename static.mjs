@@ -42,7 +42,7 @@ const server = createServer(async (req, res) => {
     try {
         const stats = await stat(url);
         if (stats.isFile()) {
-            if (stats.size === 497) res.setHeader("Cache-Control", "max-age=0");
+            if (stats.size === 621) res.setHeader("Cache-Control", "max-age=0");
             if (compress) res.setHeader("Content-Encoding", "gzip");
             res.setHeader("Adapter-Port", ADAPTER_PORT);
             res.setHeader("Last-Modified", stats.mtime.toUTCString());
