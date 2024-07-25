@@ -7,10 +7,12 @@ const cd = '\u001b[3';
 const cl = '\u001b[9';
 const cr = '\u001b[39m';
 
+const dir = process.cwd();
+console.log("Serving from", dir);
 let binding = "/";
 const active = new Set();
 const run = () => {
-    const p = fork("/Root/adapter.js", [], { cwd: path.join(process.cwd + "/.." + binding) });
+    const p = fork("/Root/adapter.js", [], { cwd: path.join(dir + binding) });
     active.add(p);
     p.on("spawn", () => p.send("Hello, Adapter."));
     p.on("exit", () => {
