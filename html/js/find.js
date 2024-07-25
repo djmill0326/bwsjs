@@ -19,6 +19,8 @@ let query = "";
 let queued = null;
 let music_browser = {};
 
+window.player_history = [];
+
 const audio_element = document.createElement("audio");
 audio_element.controls = true;
 audio_element.autoplay = true;
@@ -48,10 +50,13 @@ const file_info = link => {
 
 const describe = info => `${info[0]} [${info[1] ? info[1] : "unknown extension"}]`;
 
-const get_first_anchor = () => {
+const get_first_anchor = (queue_next=false) => {
     try {
-        const a = frame.children[1].children[0].children[0];
-        return a.href.lastIndexOf(".") - window.location.href.length < 0 ? void 0 : a;
+        const list = frame.children[1].children[0].children;
+        const a = list[0];
+        if (a.href.lastIndexOf(".") - window.location.href.length < 0) return;
+        if (queue_next) queued = list[1];
+        return a;
     } catch (_) { console.info("request failed!", term.value) }
 }
 
@@ -69,14 +74,17 @@ const pull_next_anchor = (a, looping=true) => {
     return queued = next;
 };
 
-audio_element.onended = () => {
-    if (queued) {
-        queued = pull_next_anchor(queued, true);
-        update_link(queued);
-    }
+const next_anchor_from_queue = () => {
+    if (!queued) return;
+    player_history.push(queued);
+    update_link(pull_next_anchor(queued, true));
 };
 
-let replay_slot = localStorage.lplay ? localStorage.lplay.split(":442")[1] : void 0;
+audio_element.onended = next_anchor_from_queue;
+
+let replay_slot = localStorage.lplay;
+
+const anchor_from_link = (link) => frame.querySelector(`ul > li > a[href="${link.split(":442")[1]}"]`);
 
 form.onsubmit = (e) => {
     // todo: this is retarded, no reason to do these string operations like this
@@ -87,7 +95,7 @@ form.onsubmit = (e) => {
     query_fetch(query, frame, () => {
         let reset;
         if (replay_slot) {
-            reset = frame.querySelector(`ul > li > a[href="${replay_slot}"]`);
+            reset = anchor_from_link(replay_slot);
             replay_slot = null;
             setTimeout(() => {
                 if (audio_element.src === localStorage.lplay) 
@@ -102,9 +110,10 @@ form.onsubmit = (e) => {
     });
 };
 
-const update_link = (to, time) => {
-    localStorage.lplay = queued = to;
-    const link = to.href;
+const update_link = (to) => {
+    localStorage.lplay = queued = to ? to : get_first_anchor();
+    if (!queued || !queued.href) return;
+    const link = queued.href;
     const is_music = link.contains("/music/");
     const info = file_info(link);
     if (!info[1]) {
@@ -118,7 +127,7 @@ const update_link = (to, time) => {
         audio_element.src = link;
         const song_descriptor = describe(info);
         console.log("[hapt-player/info]", `now playing: ${song_descriptor}`);
-        update_music_browser(song_descriptor);
+        update_music_browser(link, song_descriptor);
     } else if (music_browser.remove) {
         audio_element.insertAdjacentElement("beforebegin", portal);
         audio_element.remove();
@@ -139,39 +148,55 @@ frame.onclick = (e) => {
 }
 
 let label_idx = 0;
-const create_label_for = (el, text) => {
+const create_label_for = (el, text, color="#444") => {
     const label = document.createElement("label");
     if (!el.id.length > 0) {
-        el.id = label_idx++;
+        el.id = "el" + label_idx++;
     }
-    label.for = el.id;
+    label.htmlFor = el.id;
+    label.id = "l" + el.id;
     label.textContent = text;
+    label.style.color = color;
     return label;
 };
 
-const music_browser_init = (song) => {
+const bundle = (...x) => {
+    const el = document.createElement("span");
+    el.append(...x);
+    return el;
+}
+
+const music_browser_init = (link, display) => {
     const player = document.createElement("div");
     player.className = "music";
     const prev = document.createElement("button");
     const next = document.createElement("button");
     const current_song = document.createElement("a");
 
-    prev.textContent = "<";
-    next.textContent = ">";
-    current_song.textContent = song;
+    prev.onclick = () => {
+        const entry = player_history.pop();
+        if (entry) update_link(entry);
+    };
+
+    next.onclick = next_anchor_from_queue;
+
+    prev.textContent = "↩";
+    next.textContent = "↪";
+    current_song.dataset.src = decodeURI(link);
+    current_song.textContent = display;
     current_song.onclick = () => audio_element.src = audio_element.src;
 
     player.append(
-        //prev
-        create_label_for(current_song, "now playing"),
-        current_song,
-        //next
+        bundle(prev, create_label_for(prev, "prev")),
+        bundle(create_label_for(current_song, "♫", "#0ce"), current_song),
+        bundle(create_label_for(next, "next"), next)
     );
     music.append(player);
 
     music_browser = {
-        update: (song) => {
-            current_song.textContent = song;
+        update: (link, display) => {
+            current_song.textContent = display;
+            current_song.dataset.src = link;
         },
         remove: () => {
             player.remove();
@@ -180,12 +205,9 @@ const music_browser_init = (song) => {
     };
 }
 
-const update_music_browser = (song) => {
-    if (music_browser.update) {
-        music_browser.update(song);
-    } else {
-        music_browser_init(song);
-    }
+const update_music_browser = (link, display) => {
+    if (music_browser.update) music_browser.update(link, display);
+    else music_browser_init(link, display);
 };
 
 const msave = () => localStorage.ltime = audio_element.currentTime;

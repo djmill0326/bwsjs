@@ -2,13 +2,14 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.8 interactive-widget=overlays-content" />
         <title>caramelldansen</title>
         <style>
-            body { width: 35em; margin: 0 auto; font-family: system-ui } audio { width: 100% }
-            html { color-scheme: dark } * { box-sizing: border-box } label { color: #0ce } 
-            label::after { content: " --- "; color: #333 } li { list-style: none; margin: .25em 0 } 
-            .music > a, li a { color:blanchedalmond; user-select: none; } ul { padding: 0 0 0 .5em } 
+            body { width: 35em; margin: 0 auto; font-family: system-ui; top: 50%; left: 50%; position: absolute; transform: translate(-50%, -50%); max-height: 100vh; display: flex; flex-direction: column }
+            html { color-scheme: dark } * { box-sizing: border-box } audio { width: 100% } #frame { min-height: 35vh; overflow-y: scroll } #porthole { border: none; background: transparent }
+            ul { padding: 0 0 0 .5em } li { list-style: none; margin: .3em 0 } #el1, li a { color:blanchedalmond; user-select: none; } input, button { font-size: 1em }
+            span { min-width: 64px; max-width: 420px; word-break: keep-all; margin: .3em } span :first-child { margin-right: .3em } span:not(:last-child) { flex-grow: 1 }
+            #dyn { margin-bottom: .6em } .music { margin-top: .6em } .music { display: flex; width: 35em } #el1 { display:inline-block; max-width: 300px }
         </style>
     </head>
     <body>
@@ -20,16 +21,14 @@
         Your IP address is available upon 
         <a href="http://eth0.me/">clicking</a>.</p>
 
-        <p><em>Thank you for using go fuck yourself.</em></p>
-
         <form id="dyn" style="margin: 0 0 5px 0" onsubmit="return false">
             <input type="radio" style="margin: 0; width: 14px" id="back" disabled />
             <input type="text" placeholder="Enter term here" id="term" style="width: calc(89% - 24px)" />
-            <input type="submit" value="Submit" id="btn" style="width: 11%" />
+            <input type="submit" value="↻" id="btn" style="width: 11%" />
         </form>
-        <iframe id="porthole" width="560" height="315" src="favicon.ico"></iframe>
+        <iframe id="porthole" width="560" height="315" src="_.html"></iframe>
         <div id="music"></div>
-        <div id="frame" width="560"></div>
+        <div id="frame"></div>
         <script src="/js/find.js" type="module"></script>
     </body>
 </html>
